@@ -35,11 +35,30 @@ async function run() {
     const productCollection = client
       .db("engineeringWarkshop")
       .collection("products");
+    const purchesCollection = client
+      .db("engineeringWarkshop")
+      .collection("purchesed");
 
     app.get("/product", async (req, res) => {
       const query = {};
       const cursor = productCollection.find(query);
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // get data to database spesific id product (wareHouseProduct)
+    app.get("/product/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: ObjectId(id) };
+      const result = await productCollection.findOne(query);
+      res.send(result);
+    });
+
+    // add a item to main product collection
+    app.post("/product", async (req, res) => {
+      const addItem = req.body;
+      const result = await purchesCollection.insertOne(addItem);
       res.send(result);
     });
   } finally {
