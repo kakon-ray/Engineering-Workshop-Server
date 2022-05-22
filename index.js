@@ -38,12 +38,43 @@ async function run() {
     const purchesCollection = client
       .db("engineeringWarkshop")
       .collection("purchesed");
+    const userCollection = client
+      .db("engineeringWarkshop")
+      .collection("userInformation");
 
+    // get all product and create api
     app.get("/product", async (req, res) => {
       const query = {};
       const cursor = productCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
+    });
+
+    // get one user information
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = { email: email };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
+
+    // get purches order and create api
+
+    app.get("/myorder", async (req, res) => {
+      const query = {};
+      const cursor = purchesCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // delete myorder product
+
+    app.delete("/myorder/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const deleteOrder = await purchesCollection.deleteOne(query);
+      res.send(deleteOrder);
     });
 
     // get data to database spesific id product (wareHouseProduct)
@@ -59,6 +90,22 @@ async function run() {
     app.post("/product", async (req, res) => {
       const addItem = req.body;
       const result = await purchesCollection.insertOne(addItem);
+      res.send(result);
+    });
+
+    // update user data
+
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      // upsert true dile social account diye login korrar somoy ekbar er besi email add hobe na
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+
       res.send(result);
     });
   } finally {
