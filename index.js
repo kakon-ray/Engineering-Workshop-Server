@@ -56,9 +56,14 @@ async function run() {
     const purchesCollection = client
       .db("engineeringWarkshop")
       .collection("purchesed");
+
     const userCollection = client
       .db("engineeringWarkshop")
       .collection("userInformation");
+
+    const reviewCollection = client
+      .db("engineeringWarkshop")
+      .collection("review");
 
     // get all product and create api
     app.get("/product", async (req, res) => {
@@ -108,6 +113,12 @@ async function run() {
     app.post("/product", async (req, res) => {
       const addItem = req.body;
       const result = await purchesCollection.insertOne(addItem);
+      res.send(result);
+    });
+    // add a review to review collection
+    app.post("/review", async (req, res) => {
+      const addItem = req.body;
+      const result = await reviewCollection.insertOne(addItem);
       res.send(result);
     });
 
