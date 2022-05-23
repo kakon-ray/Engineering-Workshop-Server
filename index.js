@@ -1,7 +1,8 @@
 const express = require("express");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 const cors = require("cors");
-
+const jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.PORT || 5000;
 const ObjectId = require("mongodb").ObjectId;
@@ -21,7 +22,24 @@ app.listen(port, () => {
   console.log(`Engineerign Workshop is Running ${port}`);
 });
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+// Verify JWT Token
+
+function verifyJWT(req, res, next) {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+  const token = authorization.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden Access" });
+    }
+    // console.log("decoded", decoded);
+    req.decoded = decoded;
+    next();
+  });
+}
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.371m3.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -61,7 +79,7 @@ async function run() {
 
     // get purches order and create api
 
-    app.get("/myorder", async (req, res) => {
+    app.get("/myorder", verifyJWT, async (req, res) => {
       const query = {};
       const cursor = purchesCollection.find(query);
       const result = await cursor.toArray();
@@ -106,7 +124,11 @@ async function run() {
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
 
-      res.send(result);
+      // send jwt token client side
+      var token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "10day",
+      });
+      res.send({ result, token });
     });
   } finally {
   }
