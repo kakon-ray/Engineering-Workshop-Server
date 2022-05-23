@@ -91,6 +91,14 @@ async function run() {
       res.send(result);
     });
 
+    // get data review section
+    app.get("/review", verifyJWT, async (req, res) => {
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // delete myorder product
 
     app.delete("/myorder/:id", async (req, res) => {
