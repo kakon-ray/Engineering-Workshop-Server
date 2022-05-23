@@ -69,7 +69,7 @@ async function run() {
     });
 
     // get one user information
-    app.get("/user/:email", async (req, res) => {
+    app.get("/user/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       console.log(email);
       const query = { email: email };
@@ -129,6 +129,15 @@ async function run() {
         expiresIn: "10day",
       });
       res.send({ result, token });
+    });
+
+    // user admin ache kina saita check korar api
+
+    app.get("/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const user = await userCollection.findOne({ email: email });
+      const isAdmin = user.roll == "admin";
+      res.send({ admin: isAdmin });
     });
   } finally {
   }
