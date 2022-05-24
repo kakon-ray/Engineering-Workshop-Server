@@ -72,21 +72,26 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    // get all product and create api
+    app.post("/product", async (req, res) => {
+      const addItem = req.body;
+      const result = await productCollection.insertOne(addItem);
+      res.send(result);
+    });
 
     // get one user information
     app.get("/user/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+
       const query = { email: email };
       const result = await userCollection.findOne(query);
       res.send(result);
     });
 
-    // get purches order and create api
-
-    app.get("/myorder", verifyJWT, async (req, res) => {
+    // get all user
+    app.get("/user", verifyJWT, async (req, res) => {
       const query = {};
-      const cursor = purchesCollection.find(query);
+      const cursor = await userCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -95,6 +100,25 @@ async function run() {
     app.get("/review", verifyJWT, async (req, res) => {
       const query = {};
       const cursor = reviewCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // get all order to manage order
+
+    app.get("/allorder", verifyJWT, async (req, res) => {
+      const query = {};
+      const cursor = purchesCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // get order to myorder route frontend
+
+    app.get("/myorder/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const cursor = purchesCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -109,16 +133,16 @@ async function run() {
     });
 
     // get data to database spesific id product (wareHouseProduct)
-    app.get("/product/:id", async (req, res) => {
+    app.get("/product/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
-
       const query = { _id: ObjectId(id) };
       const result = await productCollection.findOne(query);
+
       res.send(result);
     });
 
-    // add a item to main product collection
-    app.post("/product", async (req, res) => {
+    // add a item to main purches collection
+    app.post("/purches", async (req, res) => {
       const addItem = req.body;
       const result = await purchesCollection.insertOne(addItem);
       res.send(result);
@@ -157,6 +181,16 @@ async function run() {
       const user = await userCollection.findOne({ email: email });
       const isAdmin = user.roll == "admin";
       res.send({ admin: isAdmin });
+    });
+
+    app.put("/user/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { roll: "admin" },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
     });
   } finally {
   }
