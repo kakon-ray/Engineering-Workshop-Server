@@ -107,9 +107,10 @@ async function run() {
     });
 
     // get data review section
-    app.get("/review", verifyJWT, async (req, res) => {
+    app.get("/review", async (req, res) => {
       const query = {};
-      const result = await reviewCollection.find(query).toArray();
+      const cursor = reviewCollection.find(query);
+      const result = await cursor.toArray();
       res.send(result);
     });
 
