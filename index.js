@@ -138,6 +138,14 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    // get order to pement route
+
+    app.get("/myorderPement/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await purchesCollection.findOne(query);
+      res.send(result);
+    });
 
     // delete myorder product
 
