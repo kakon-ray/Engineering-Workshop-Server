@@ -221,6 +221,25 @@ async function run() {
       res.send(result);
     });
 
+    // update status pement completed
+
+    app.patch("/updateStatus/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          paid: true,
+          status: "Shift",
+        },
+      };
+      const updatedResult = await purchesCollection.updateOne(
+        filter,
+        updateDoc
+      );
+
+      res.send(updateDoc);
+    });
+
     // pement completed after update database purchescollection paid true
 
     app.patch("/myorderPement/:id", verifyJWT, async (req, res) => {
