@@ -231,6 +231,7 @@ async function run() {
       const updateDoc = {
         $set: {
           paid: true,
+          status: "panding",
           transactionId: peyment.transactionId,
         },
       };
