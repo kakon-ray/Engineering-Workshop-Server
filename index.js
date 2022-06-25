@@ -7,8 +7,6 @@ const app = express();
 const port = process.env.PORT || 5000;
 const ObjectId = require("mongodb").ObjectId;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-// username: engineering_user
-// password: 9UMTD4Vv7atdcg2B
 
 // middleware
 app.use(cors());
